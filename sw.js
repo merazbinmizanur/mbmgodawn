@@ -2,7 +2,7 @@
    Basic app-shell caching so the app opens instantly and installs
    as a PWA. Does not cache Telegram API calls (always network). */
 
-const CACHE_NAME = "mbm-enterprise-v1";
+const CACHE_NAME = "mbm-enterprise-v2";
 const APP_SHELL = [
   "./index.html",
   "./style.css",

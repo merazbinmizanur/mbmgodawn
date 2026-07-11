@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>MBM ENTERPRISE</title>
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="premium.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#B5792B">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MBM Enterprise">
+<link rel="apple-touch-icon" href="logo.png">
+</head>
+<body>
+
+<!-- ===== SPLASH SCREEN ===== -->
+<div class="splash-screen" id="splashScreen">
+  <div class="splash-logo-wrap">
+    <img src="logo.png" alt="" id="splashLogoImg" onerror="this.style.display='none'; document.getElementById('splashFallback').style.display='flex';">
+    <div class="splash-fallback" id="splashFallback">MBM</div>
+    <span class="splash-ring"></span>
+  </div>
+  <div class="splash-title">MBM ENTERPRISE</div>
+  <div class="splash-tag">Yarn Business Management</div>
+  <div class="splash-bar"><span></span></div>
+</div>
+
+<!-- ===== PIN LOCK SCREEN ===== -->
+<div class="lock-screen hidden" id="lockScreen">
+  <div class="lock-box">
+    <div class="lock-icon">🔒</div>
+    <h2>Enter PIN</h2>
+    <p class="muted">Enter your 4-digit PIN to unlock</p>
+    <div class="pin-dots" id="pinDots">
+      <span></span><span></span><span></span><span></span>
+    </div>
+    <p class="pin-error hidden" id="pinError">Incorrect PIN, try again</p>
+    <div class="pin-pad" id="pinPad">
+      <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
+      <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
+      <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
+      <button class="pin-blank" tabindex="-1"></button><button data-k="0">0</button><button data-k="back">⌫</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== AMBIENT SPATIAL BACKGROUND (decorative only) ===== -->
+<div class="ambient-bg" aria-hidden="true">
+  <span class="orb orb-1"></span>
+  <span class="orb orb-2"></span>
+  <span class="orb orb-3"></span>
+</div>
+
+<!-- ===== PULL TO REFRESH INDICATOR ===== -->
+<div class="ptr-indicator" id="ptrIndicator"><span class="ptr-spin">🧵</span></div>
+
+<!-- ===== PWA INSTALL BANNER ===== -->
+<div class="install-banner hidden" id="installBanner">
+  <span class="install-icon">📲</span>
+  <div class="install-text">
+    <strong>Install MBM Enterprise</strong>
+    <span>Add to Home Screen for the full app feel</span>
+  </div>
+  <button class="install-btn" id="installBtn">Install</button>
+  <button class="install-close" id="installCloseBtn">✕</button>
+</div>
+
+<!-- ===== CONFETTI CANVAS ===== -->
+<canvas id="confettiCanvas" class="confetti-canvas"></canvas>
+
+<!-- ===== TOP HEADER ===== -->
+<header class="app-header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="logo-wrap">
+        <img src="logo.png" alt="MBM Enterprise Logo" id="logoImg" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';">
+        <div class="logo-fallback" id="logoFallback">MBM</div>
+      </div>
+      <div class="brand-text">
+        <h1>MBM ENTERPRISE</h1>
+        <span class="brand-tag">Yarn Business Management</span>
+      </div>
+    </div>
+    <button class="icon-btn" id="topDarkToggle" title="Dark Mode">
+      <svg id="topThemeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+  <div class="stitch-line"></div>
+</header>
+
+<!-- ===== MAIN APP CONTENT ===== -->
+<main id="mainContent" class="main-content">
+
+  <!-- ---------- HOME ---------- -->
+  <section class="view" id="view-home">
+    <div class="section-title">
+      <h2>Dashboard</h2>
+      <p class="muted" id="homeDateLine">Today</p>
+    </div>
+
+    <div class="reminder-stack" id="reminderStack"></div>
+
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-icon accent">👥</div>
+        <div class="stat-info">
+          <span class="stat-value" id="statEmployeeCount">0</span>
+          <span class="stat-label">Total Employees</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon danger">💸</div>
+        <div class="stat-info">
+          <span class="stat-value" id="statSalaryDue">Tk 0</span>
+          <span class="stat-label">Salary Due This Month</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" id="rentStatusIcon">🏬</div>
+        <div class="stat-info">
+          <span class="stat-value" id="statRentStatus">-</span>
+          <span class="stat-label">Godawn Rent</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" id="elecStatusIcon">⚡</div>
+        <div class="stat-info">
+          <span class="stat-value" id="statElecStatus">-</span>
+          <span class="stat-label">Electricity Bill</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stitch-line small"></div>
+
+    <div class="card" id="homeSummaryCard">
+      <div class="card-head">
+        <h3>This Month's Summary</h3>
+        <span class="pill" id="homeMonthPill">-</span>
+      </div>
+      <div class="summary-row">
+        <span>Total Salary Expenses (Paid)</span>
+        <strong id="sumSalaryPaid">Tk 0</strong>
+      </div>
+      <div class="summary-row">
+        <span>Godawn Rent Paid</span>
+        <strong id="sumRentPaid">Tk 0</strong>
+      </div>
+      <div class="summary-row">
+        <span>Electricity Bill Paid</span>
+        <strong id="sumElecPaid">Tk 0</strong>
+      </div>
+      <div class="summary-row">
+        <span>Other Expenses</span>
+        <strong id="sumOthersPaid">Tk 0</strong>
+      </div>
+      <div class="stitch-line small"></div>
+      <div class="summary-row total-row">
+        <span>Grand Total (This Month)</span>
+        <strong id="sumTotalAll">Tk 0</strong>
+      </div>
+      <button class="pdf-export-btn" data-pdf-target="homeSummaryCard" data-pdf-name="Monthly_Summary">📄 Export as PDF</button>
+    </div>
+
+    <div class="quick-actions">
+      <button class="qa-btn" data-nav="employees">👥 View Employees</button>
+      <button class="qa-btn" data-nav="expenses">🧾 View Expenses</button>
+      <button class="qa-btn" data-nav="godawn"> 🧵View Godawn Stoke  </button>
+      <button class="qa-btn" id="qaBackupNow">☁️ Send Backup</button>
+    </div>
+  </section>
+
+  <!-- ---------- EMPLOYEES ---------- -->
+  <section class="view hidden" id="view-employees">
+    <div class="section-title">
+      <h2>Employee List</h2>
+      <button class="fab-small" id="addEmployeeBtn">+ New</button>
+    </div>
+
+    <div class="filter-row">
+      <input type="text" id="empSearchInput" class="neo-input" placeholder="🔍 Search by name or phone">
+    </div>
+    <div class="filter-row">
+      <select id="empMonthSelect" class="neo-select"></select>
+      <div class="mini-stats">
+        <span>Total Due: <strong id="empTotalDue" class="txt-danger">Tk 0</strong></span>
+        <span>Total Advance: <strong id="empTotalAdvance" class="txt-success">Tk 0</strong></span>
+      </div>
+    </div>
+<div class="card attendance-card">
+      <div class="card-head"><h3>📅 Attendance Sheet</h3></div>
+      <p class="muted">Mark daily Present / Half-day / Absent for each employee. Doesn't affect salary.</p>
+      <button class="primary-btn" id="openAttendanceBtn">Open Attendance Sheet</button>
+    </div>
+
+    <p class="swipe-hint">💡 Tip: Swipe any card left to reveal quick delete</p>
+    <div id="employeeList" class="list-stack"></div>
+    <p class="empty-hint hidden" id="employeeEmptyHint">No employees added. Click the "+ New" button above.</p>
+  </section>
+
+  <!-- ---------- EXPENSES ---------- -->
+  <section class="view hidden" id="view-expenses">
+    <div class="section-title">
+      <h2>Expense Management</h2>
+    </div>
+
+    <div class="tabbar">
+      <button class="tab-btn active" data-tab="rent">Rent</button>
+      <button class="tab-btn" data-tab="electricity">Bill</button>
+      <button class="tab-btn" data-tab="others">Others</button>
+      <button class="tab-btn" data-tab="summary">Summary</button>
+    </div>
+
+    <!-- GODAWN RENT TAB -->
+    <div class="tab-panel" id="tab-rent">
+      <div class="filter-row">
+        <select id="rentMonthSelect" class="neo-select"></select>
+        <span class="pill" id="rentStatusPill">-</span>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <h3>Fixed Rent</h3>
+          <button class="link-btn" id="editRentAmountBtn">Change</button>
+        </div>
+        <div class="big-amount" id="rentAmountShow">Tk 0</div>
+        <div class="progress-line"><div class="progress-fill" id="rentProgressFill"></div></div>
+        <div class="summary-row"><span>Paid</span><strong id="rentPaidShow">Tk 0</strong></div>
+        <div class="summary-row"><span>Due</span><strong id="rentDueShow" class="txt-danger">Tk 0</strong></div>
+        <button class="primary-btn" id="payRentBtn">Pay Rent</button>
+      </div>
+      <h3 class="list-title">Payment History</h3>
+      <div id="rentHistoryList" class="list-stack"></div>
+      <p class="empty-hint hidden" id="rentEmptyHint">No payments recorded this month.</p>
+    </div>
+
+    <!-- ELECTRICITY TAB -->
+    <div class="tab-panel hidden" id="tab-electricity">
+      <div class="filter-row">
+        <select id="elecMonthSelect" class="neo-select"></select>
+        <span class="pill" id="elecStatusPill">-</span>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <h3>Bill for This Month</h3>
+          <button class="link-btn" id="editElecAmountBtn">Set Bill</button>
+        </div>
+        <div class="big-amount" id="elecAmountShow">Tk 0</div>
+        <div class="progress-line"><div class="progress-fill" id="elecProgressFill"></div></div>
+        <div class="summary-row"><span>Paid</span><strong id="elecPaidShow">Tk 0</strong></div>
+        <div class="summary-row"><span>Due</span><strong id="elecDueShow" class="txt-danger">Tk 0</strong></div>
+        <button class="primary-btn" id="payElecBtn">Pay Bill</button>
+      </div>
+      <h3 class="list-title">Payment History</h3>
+      <div id="elecHistoryList" class="list-stack"></div>
+      <p class="empty-hint hidden" id="elecEmptyHint">No payments recorded this month.</p>
+    </div>
+
+    <!-- OTHERS TAB -->
+    <div class="tab-panel hidden" id="tab-others">
+      <div class="filter-row">
+        <select id="othersMonthSelect" class="neo-select"></select>
+        <button class="fab-small" id="addOtherBtn">+ Add Expense</button>
+      </div>
+      <div class="filter-row">
+        <input type="text" id="othersSearchInput" class="neo-input list-filter-input" data-filter-list="othersList" placeholder="🔍 Search expense title or note">
+      </div>
+      <div class="card">
+        <div class="summary-row total-row"><span>Total Expense</span><strong id="othersTotalShow">Tk 0</strong></div>
+      </div>
+      <div id="othersList" class="list-stack"></div>
+      <p class="empty-hint hidden" id="othersEmptyHint">No expenses recorded this month.</p>
+    </div>
+
+    <!-- SUMMARY TAB (Month to Month) -->
+    <div class="tab-panel hidden" id="tab-summary">
+      <div class="filter-row">
+        <input type="text" id="expenseSummarySearch" class="neo-input" placeholder="🔍 Search month (e.g. January, 2026)">
+      </div>
+      <div class="card" id="expenseSummaryCard">
+        <div class="card-head"><h3>Grand Total (Filtered)</h3></div>
+        <div class="summary-row total-row"><span>All Months Total</span><strong id="expenseSummaryGrandTotal">Tk 0</strong></div>
+        <div class="chart-wrap">
+          <canvas id="expenseDonutChart" width="220" height="220"></canvas>
+          <div class="chart-legend" id="expenseChartLegend"></div>
+        </div>
+        <button class="pdf-export-btn" data-pdf-target="expenseSummaryCard" data-pdf-name="Expense_Summary">📄 Export as PDF</button>
+      </div>
+      <div id="expenseSummaryList" class="list-stack"></div>
+    </div>
+  </section>
+
+  <!-- ---------- GODAWN ---------- -->
+  <section class="view hidden" id="view-godawn">
+    <div class="section-title">
+      <h2>Godawn (Yarn Stock)</h2>
+    </div>
+
+    <div class="tabbar" id="godawnTabbar">
+<button class="tab-btn active" data-gtab="purchase">Yarn Purchase</button>
+<button class="tab-btn" data-gtab="sale">Yarn Sale</button>
+<button class="tab-btn" data-gtab="summary">Summary</button>
+    </div>
+
+    <!-- PURCHASE TAB -->
+    <div class="tab-panel" id="gtab-purchase">
+      <div class="filter-row">
+        <select id="purchaseMonthSelect" class="neo-select"></select>
+<button class="fab-small" id="addPurchaseBtn">+ Add Purchase</button>
+</div>
+<div class="filter-row">
+  <input type="text" id="purchaseSearchInput" class="neo-input list-filter-input" data-filter-list="purchaseList" placeholder="🔍 Search item or party">
+</div>
+<div class="card">
+  <div class="summary-row"><span>Total Purchase Qty</span><strong id="purchaseTotalQty">0</strong></div>
+  <div class="summary-row total-row"><span>Total Cost</span><strong id="purchaseTotalAmount">Tk 0</strong></div>
+</div>
+<h3 class="list-title">Purchase List</h3>
+<div id="purchaseList" class="list-stack"></div>
+<p class="empty-hint hidden" id="purchaseEmptyHint">No purchases recorded this month.</p>
+    </div>
+
+    <!-- SALE TAB -->
+    <div class="tab-panel hidden" id="gtab-sale">
+      <div class="filter-row">
+        <select id="saleMonthSelect" class="neo-select"></select>
+<button class="fab-small" id="addSaleBtn">+ Add Sale</button>
+</div>
+<div class="filter-row">
+  <input type="text" id="saleSearchInput" class="neo-input list-filter-input" data-filter-list="saleList" placeholder="🔍 Search item or party">
+</div>
+<div class="card">
+  <div class="summary-row"><span>Total Sale Qty</span><strong id="saleTotalQty">0</strong></div>
+  <div class="summary-row total-row"><span>Total Income</span><strong id="saleTotalAmount">Tk 0</strong></div>
+</div>
+<h3 class="list-title">Sale List</h3>
+<div id="saleList" class="list-stack"></div>
+<p class="empty-hint hidden" id="saleEmptyHint">No sales recorded this month.</p>
+    </div>
+
+    <!-- SUMMARY TAB (Month to Month) -->
+    <div class="tab-panel hidden" id="gtab-summary">
+      <div class="filter-row">
+<input type="text" id="godawnSummarySearch" class="neo-input" placeholder="🔍 Search month (e.g. January, 2026)">
+    </div>
+    <div class="card" id="godawnSummaryCard">
+      <div class="card-head"><h3>This Month's Status</h3><span class="pill" id="godawnCurrentMonthPill">-</span></div>
+      <div class="summary-row"><span>Purchase</span><strong id="godawnCurPurchase" class="txt-danger">Tk 0</strong></div>
+      <div class="summary-row"><span>Sale</span><strong id="godawnCurSale" class="txt-success">Tk 0</strong></div>
+      <div class="stitch-line small"></div>
+      <div class="summary-row total-row"><span>Net Profit/Loss</span><strong id="godawnCurNet">Tk 0</strong></div>
+      <div class="chart-wrap">
+        <canvas id="godawnBarChart" width="260" height="160"></canvas>
+      </div>
+      <button class="pdf-export-btn" data-pdf-target="godawnSummaryCard" data-pdf-name="Godawn_Summary">📄 Export as PDF</button>
+    </div>
+    <h3 class="list-title">Month-to-Month Details</h3>
+      <div id="godawnSummaryList" class="list-stack"></div>
+    </div>
+  </section>
+
+  <!-- ---------- SETTINGS ---------- -->
+  <section class="view hidden" id="view-settings">
+    <div class="section-title"><h2>Settings</h2></div>
+
+    <div class="card">
+      <div class="card-head"><h3>Business Information</h3></div>
+      <label class="field-label">Business Name</label>
+      <input type="text" id="settingBizName" class="neo-input" value="MBM ENTERPRISE">
+      <button class="secondary-btn" id="saveBizNameBtn">Save</button>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Dark Mode</h3>
+        <label class="switch">
+          <input type="checkbox" id="darkModeToggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <p class="muted">Turn dark theme on/off for eye comfort.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>🔒 App Lock (PIN)</h3>
+        <label class="switch">
+          <input type="checkbox" id="pinLockToggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <p class="muted">When enabled, a 4-digit PIN is required to open the app.</p>
+      <button class="secondary-btn" id="lockNowBtn">🔒 Lock App Now</button>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>📲 Install App</h3></div>
+      <p class="muted">Install MBM Enterprise on your device for a full-screen, app-like experience.</p>
+      <button class="primary-btn" id="settingsInstallBtn">📲 Add to Home Screen</button>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>☁️ Telegram Backup</h3>
+      </div>
+      <p class="muted">Backup and restore all application data using Telegram.</p>
+
+      <div class="settings-row">
+        <span>Send auto backup on app open</span>
+        <label class="switch">
+          <input type="checkbox" id="autoBackupToggle" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <button class="primary-btn" id="sendBackupBtn">🚀 Send Backup Now</button>
+      <button class="secondary-btn" id="fetchBackupBtn">⬇️ Fetch Latest Backup from Telegram</button>
+
+      <div class="stitch-line small"></div>
+
+      <label class="field-label">Or Import from File</label>
+      <input type="file" id="importFileInput" accept="application/json" class="neo-input file-input">
+
+      <p class="status-text" id="backupStatusText"></p>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>⚠️ Danger Zone</h3></div>
+      <p class="muted">Once deleted, all data is permanently lost (unless backed up).</p>
+      <button class="danger-btn" id="clearAllBtn">Delete All Data</button>
+    </div>
+
+    <p class="app-version">Meraz Bin Mizanur </p>
+  </section>
+
+</main>
+
+<!-- ===== BOTTOM DYNAMIC ISLAND NAV ===== -->
+<nav class="island-nav" id="islandNav">
+  <button class="nav-item active" data-view="home">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
+    <span>HOME</span>
+  </button>
+  <button class="nav-item" data-view="employees">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    <span>EMPLOYEES</span>
+  </button>
+  <button class="nav-item" data-view="expenses">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+    <span>EXPENSES</span>
+  </button>
+  <button class="nav-item" data-view="godawn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V10.5L12 5l7 5.5V21"/><path d="M9 21v-6h6v6"/><path d="M9 12h.01M15 12h.01"/></svg>
+    <span>GODAWN</span>
+  </button>
+  <button class="nav-item" data-view="settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    <span>SETTINGS</span>
+  </button>
+  <div class="nav-indicator" id="navIndicator"></div>
+</nav>
+
+<!-- ===== MODAL ===== -->
+<div class="modal-overlay hidden" id="modalOverlay">
+  <div class="modal-box" id="modalBox">
+    <div class="modal-head">
+      <h3 id="modalTitle">Title</h3>
+      <button class="icon-btn" id="modalCloseBtn">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast hidden" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="script.js"></script>
+<script src="premium.js"></script>
+</body>
+</html>
